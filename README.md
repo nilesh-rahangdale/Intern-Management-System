@@ -139,9 +139,9 @@ DRDO PROJECT FINAL/
 
 ## API Documentation
 
-Refer to the [API DOCUMENTATION README](Backend\API_DOCUMENTATION.md) for detailed API documentation and endpoints.
+Refer to the [API DOCUMENTATION README](Backend/API_DOCUMENTATION.md) for detailed API documentation and endpoints.
 
-Refer to the [Backend README](Backend\README.md) for backend setup.
+Refer to the [Backend README](Backend/README.md) for backend setup.
 
 ## Blockchain Documentation
 
