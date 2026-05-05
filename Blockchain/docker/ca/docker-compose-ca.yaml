@@ -1,0 +1,70 @@
+services:
+  ca-hr:
+    image: hyperledger/fabric-ca:${FABRIC_CA_VERSION}
+    container_name: ${CA_HR_NAME}
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=${CA_HR_NAME}
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=${CA_HR_PORT}
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:${CA_HR_OPERATIONS_PORT}
+      - FABRIC_CA_SERVER_DB_TYPE=${CA_DB_TYPE}
+    ports:
+      - "${CA_HR_PORT}:${CA_HR_PORT}"
+      - "${CA_HR_OPERATIONS_PORT}:${CA_HR_OPERATIONS_PORT}"
+    volumes:
+      - ../../organizations/fabric-ca/ca-hr:/etc/hyperledger/fabric-ca-server
+    command: >-
+      sh -c "fabric-ca-server start -b ${CA_HR_ADMIN}:${CA_HR_ADMIN_PW} -d"
+    networks:
+      - test
+
+  ca-director:
+    image: hyperledger/fabric-ca:${FABRIC_CA_VERSION}
+    container_name: ${CA_DIRECTOR_NAME}
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=${CA_DIRECTOR_NAME}
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=${CA_DIRECTOR_PORT}
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:${CA_DIRECTOR_OPERATIONS_PORT}
+      - FABRIC_CA_SERVER_DB_TYPE=${CA_DB_TYPE}
+    ports:
+      - "${CA_DIRECTOR_PORT}:${CA_DIRECTOR_PORT}"
+      - "${CA_DIRECTOR_OPERATIONS_PORT}:${CA_DIRECTOR_OPERATIONS_PORT}"
+    volumes:
+      - ../../organizations/fabric-ca/ca-director:/etc/hyperledger/fabric-ca-server
+    command: >-
+      sh -c "fabric-ca-server start -b ${CA_DIRECTOR_ADMIN}:${CA_DIRECTOR_ADMIN_PW} -d"
+    networks:
+      - test
+
+  ca-orderer:
+    image: hyperledger/fabric-ca:${FABRIC_CA_VERSION}
+    container_name: ${CA_ORDERER_NAME}
+    labels:
+      service: hyperledger-fabric
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=${CA_ORDERER_NAME}
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_PORT=${CA_ORDERER_PORT}
+      - FABRIC_CA_SERVER_OPERATIONS_LISTENADDRESS=0.0.0.0:${CA_ORDERER_OPERATIONS_PORT}
+      - FABRIC_CA_SERVER_DB_TYPE=${CA_DB_TYPE}
+    ports:
+      - "${CA_ORDERER_PORT}:${CA_ORDERER_PORT}"
+      - "${CA_ORDERER_OPERATIONS_PORT}:${CA_ORDERER_OPERATIONS_PORT}"
+    volumes:
+      - ../../organizations/fabric-ca/ca-orderer:/etc/hyperledger/fabric-ca-server
+    command: >-
+      sh -c "fabric-ca-server start -b ${CA_ORDERER_ADMIN}:${CA_ORDERER_ADMIN_PW} -d"
+    networks:
+      - test
+
+networks:
+  test:
+    name: drdo-blockchain-test

@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.gitignore
+README.md
+API_DOCUMENTATION.md
+API_INTEGRATION_PROGRESS.md
+.vscode
+.idea
+*.log
+Dockerfile
+docker-compose.yml
+.DS_Store

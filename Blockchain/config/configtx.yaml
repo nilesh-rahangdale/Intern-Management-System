@@ -1,0 +1,167 @@
+Organizations:
+  - &HR
+      Name: HRMSP
+      ID: HRMSP
+      MSPDir: ../organizations/peerOrganizations/hr.certportal.com/msp
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('HRMSP.admin', 'HRMSP.peer', 'HRMSP.client')"
+        Writers:
+          Type: Signature
+          Rule: "OR('HRMSP.admin', 'HRMSP.client')"
+        Admins:
+          Type: Signature
+          Rule: "OR('HRMSP.admin')"
+        Endorsement:
+          Type: Signature
+          Rule: "OR('HRMSP.peer')"
+
+  - &Director
+      Name: DirectorMSP
+      ID: DirectorMSP
+      MSPDir: ../organizations/peerOrganizations/director.certportal.com/msp
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('DirectorMSP.admin', 'DirectorMSP.peer', 'DirectorMSP.client')"
+        Writers:
+          Type: Signature
+          Rule: "OR('DirectorMSP.admin', 'DirectorMSP.client')"
+        Admins:
+          Type: Signature
+          Rule: "OR('DirectorMSP.admin')"
+        Endorsement:
+          Type: Signature
+          Rule: "OR('DirectorMSP.peer')"
+
+  - &OrdererOrg
+      Name: OrdererMSP
+      ID: OrdererMSP
+      MSPDir: ../organizations/ordererOrganizations/orderer.certportal.com/msp
+      Policies:
+        Readers:
+          Type: Signature
+          Rule: "OR('OrdererMSP.member')"
+        Writers:
+          Type: Signature
+          Rule: "OR('OrdererMSP.member')"
+        Admins:
+          Type: Signature
+          Rule: "OR('OrdererMSP.admin')"
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_5: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    # Required for Fabric 2.x new chaincode lifecycle (approve/commit)
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: Signature
+      Rule: "AND('HRMSP.peer','DirectorMSP.peer')"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  Addresses:
+    - orderer1.orderer.certportal.com:7050
+    - orderer2.orderer.certportal.com:8050
+    - orderer3.orderer.certportal.com:9050
+  EtcdRaft:
+    Consenters:
+      - Host: orderer1.orderer.certportal.com
+        Port: 7050
+        ClientTLSCert: ../organizations/ordererOrganizations/orderer.certportal.com/orderers/orderer1.orderer.certportal.com/tls/server.crt
+        ServerTLSCert: ../organizations/ordererOrganizations/orderer.certportal.com/orderers/orderer1.orderer.certportal.com/tls/server.crt
+      - Host: orderer2.orderer.certportal.com
+        Port: 8050
+        ClientTLSCert: ../organizations/ordererOrganizations/orderer.certportal.com/orderers/orderer2.orderer.certportal.com/tls/server.crt
+        ServerTLSCert: ../organizations/ordererOrganizations/orderer.certportal.com/orderers/orderer2.orderer.certportal.com/tls/server.crt
+      - Host: orderer3.orderer.certportal.com
+        Port: 9050
+        ClientTLSCert: ../organizations/ordererOrganizations/orderer.certportal.com/orderers/orderer3.orderer.certportal.com/tls/server.crt
+        ServerTLSCert: ../organizations/ordererOrganizations/orderer.certportal.com/orderers/orderer3.orderer.certportal.com/tls/server.crt
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 100
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Writers"
+  Capabilities:
+    <<: *OrdererCapabilities
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+
+Profiles:
+  CertPortalChannel:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *HR
+        - *Director
+      Policies:
+        Readers:
+          Type: ImplicitMeta
+          Rule: "ANY Readers"
+        Writers:
+          Type: ImplicitMeta
+          Rule: "ANY Writers"
+        Admins:
+          Type: ImplicitMeta
+          Rule: "MAJORITY Admins"
+        # Required for Fabric 2.x new chaincode lifecycle
+        LifecycleEndorsement:
+          Type: ImplicitMeta
+          Rule: "MAJORITY Endorsement"
+        Endorsement:
+          Type: Signature
+          Rule: "AND('HRMSP.peer','DirectorMSP.peer')"

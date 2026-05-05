@@ -1,0 +1,87 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: cert_gen_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-cert_generator}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-cert_generator}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - test
+
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cert_gen_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-cert_generator}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+
+      SECRET_KEY: ${SECRET_KEY}
+      EXPIRATION: ${EXPIRATION:-1}
+
+      SPRING_MAIL_HOST: ${SPRING_MAIL_HOST:-smtp.gmail.com}
+      SPRING_MAIL_PORT: ${SPRING_MAIL_PORT:-587}
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: ${SPRING_MAIL_SMTP_AUTH:-true}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: ${SPRING_MAIL_STARTTLS_ENABLE:-true}
+
+      CERTIFICATE_STORAGE_PDF_PATH: ${CERTIFICATE_STORAGE_PDF_PATH:-/app/ServerStorage/certificates}
+      VERIFICATION_BASE_URL: ${VERIFICATION_BASE_URL:-http://localhost:8080/api/verification/verify/}
+
+      DIRECTOR_KEYSTORE_PATH: /app/ServerStorage/rootca/director-keystore.p12
+      DIRECTOR_KEYSTORE_PASSWORD: ${DIRECTOR_KEYSTORE_PASSWORD}
+      DIRECTOR_KEYSTORE_ALIAS: ${DIRECTOR_KEYSTORE_ALIAS:-director}
+      ROOT_CA_CERT_PATH: /app/ServerStorage/rootca/drdo-root-ca.pem
+
+      #  overrides if Fabric network is outside this compose stack.
+      APP_BLOCKCHAIN_ORDERER_ENDPOINT: ${APP_BLOCKCHAIN_ORDERER_ENDPOINT:-orderer1.orderer.certportal.com:7050}
+      APP_BLOCKCHAIN_ORDERER_TLS_CA_CERT_PATH: ${APP_BLOCKCHAIN_ORDERER_TLS_CA_CERT_PATH:-/app/fabric/organizations/ordererOrganizations/orderer.certportal.com/orderers/orderer1.orderer.certportal.com/tls/ca.crt}
+      APP_BLOCKCHAIN_PEERS_HR_ENDPOINT: ${APP_BLOCKCHAIN_PEERS_HR_ENDPOINT:-peer1.hr.certportal.com:7051}
+      APP_BLOCKCHAIN_PEERS_HR_TLS_CA_CERT_PATH: ${APP_BLOCKCHAIN_PEERS_HR_TLS_CA_CERT_PATH:-/app/fabric/organizations/peerOrganizations/hr.certportal.com/peers/peer1.hr.certportal.com/tls/ca.crt}
+      APP_BLOCKCHAIN_PEERS_DIRECTOR_ENDPOINT: ${APP_BLOCKCHAIN_PEERS_DIRECTOR_ENDPOINT:-peer1.director.certportal.com:9051}
+      APP_BLOCKCHAIN_PEERS_DIRECTOR_TLS_CA_CERT_PATH: ${APP_BLOCKCHAIN_PEERS_DIRECTOR_TLS_CA_CERT_PATH:-/app/fabric/organizations/peerOrganizations/director.certportal.com/peers/peer1.director.certportal.com/tls/ca.crt}
+      APP_BLOCKCHAIN_IDENTITIES_HR_CERT_PATH: ${APP_BLOCKCHAIN_IDENTITIES_HR_CERT_PATH:-/app/fabric/organizations/peerOrganizations/hr.certportal.com/users/User1@hr.certportal.com/msp/signcerts/cert.pem}
+      APP_BLOCKCHAIN_IDENTITIES_HR_KEY_DIR: ${APP_BLOCKCHAIN_IDENTITIES_HR_KEY_DIR:-/app/fabric/organizations/peerOrganizations/hr.certportal.com/users/User1@hr.certportal.com/msp/keystore}
+      APP_BLOCKCHAIN_IDENTITIES_DIRECTOR_CERT_PATH: ${APP_BLOCKCHAIN_IDENTITIES_DIRECTOR_CERT_PATH:-/app/fabric/organizations/peerOrganizations/director.certportal.com/users/User1@director.certportal.com/msp/signcerts/cert.pem}
+      APP_BLOCKCHAIN_IDENTITIES_DIRECTOR_KEY_DIR: ${APP_BLOCKCHAIN_IDENTITIES_DIRECTOR_KEY_DIR:-/app/fabric/organizations/peerOrganizations/director.certportal.com/users/User1@director.certportal.com/msp/keystore}
+      APP_BLOCKCHAIN_IDENTITIES_VERIFIER_CERT_PATH: ${APP_BLOCKCHAIN_IDENTITIES_VERIFIER_CERT_PATH:-/app/fabric/organizations/peerOrganizations/hr.certportal.com/users/User2@hr.certportal.com/msp/signcerts/cert.pem}
+      APP_BLOCKCHAIN_IDENTITIES_VERIFIER_KEY_DIR: ${APP_BLOCKCHAIN_IDENTITIES_VERIFIER_KEY_DIR:-/app/fabric/organizations/peerOrganizations/hr.certportal.com/users/User2@hr.certportal.com/msp/keystore}
+
+      JAVA_OPTS: ${JAVA_OPTS:-}
+    volumes:
+      - ./ServerStorage/certificates:/app/ServerStorage/certificates
+      - ./ServerStorage/rootca:/app/ServerStorage/rootca
+      - ${FABRIC_ORGS_HOST_PATH:-../organizations}:/app/fabric/organizations:ro
+    networks:
+      - test
+
+
+volumes:
+  postgres_data:
+
+networks:
+  test:
+    name: drdo-blockchain-test
+    external: true
+

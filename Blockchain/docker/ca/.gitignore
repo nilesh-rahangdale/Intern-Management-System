@@ -1,0 +1,13 @@
+ca-hr/fabric-ca-server.db
+ca-director/fabric-ca-server.db
+ca-orderer/fabric-ca-server.db
+ca-hr/msp/
+ca-director/msp/
+ca-orderer/msp/
+ca-hr/tls-cert.pem
+ca-hr/tls-key.pem
+ca-director/tls-cert.pem
+ca-director/tls-key.pem
+ca-orderer/tls-cert.pem
+ca-orderer/tls-key.pem
+organizations/

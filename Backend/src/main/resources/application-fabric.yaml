@@ -1,0 +1,68 @@
+logging:
+  level:
+    root: INFO
+    org.hyperledger.fabric: INFO
+    io.grpc: INFO
+
+app:
+  blockchain:
+    channel-name: certportal-channel
+
+    chaincode:
+      name: certificatecc
+      version: "1.0"
+      sequence: 1
+      endorsement-policy: "AND('HRMSP.peer','DirectorMSP.peer')"
+
+    gateway:
+      evaluate-timeout: 10s
+      endorse-timeout: 15s
+      submit-timeout: 15s
+      commit-status-timeout: 60s
+
+    orderer:
+      endpoint: localhost:7050
+      tls-host-override: orderer1.orderer.certportal.com
+      tls-ca-cert-path: \\wsl.localhost\Ubuntu\home\nilesh\DRDO_BLOCKCHAIN_PROJECT\organizations\ordererOrganizations\orderer.certportal.com\orderers\orderer1.orderer.certportal.com\tls\ca.crt
+
+    peers:
+      hr:
+        endpoint: localhost:7051
+        tls-host-override: peer1.hr.certportal.com
+        tls-ca-cert-path: \\wsl.localhost\Ubuntu\home\nilesh\DRDO_BLOCKCHAIN_PROJECT\organizations\peerOrganizations\hr.certportal.com\peers\peer1.hr.certportal.com\tls\ca.crt
+        endpoint-backup: localhost:8051
+      director:
+        endpoint: localhost:9051
+        tls-host-override: peer1.director.certportal.com
+        tls-ca-cert-path: \\wsl.localhost\Ubuntu\home\nilesh\DRDO_BLOCKCHAIN_PROJECT\organizations\peerOrganizations\director.certportal.com\peers\peer1.director.certportal.com\tls\ca.crt
+        endpoint-backup: localhost:10051
+
+    msp:
+      hr-msp-id: HRMSP
+      director-msp-id: DirectorMSP
+      orderer-msp-id: OrdererMSP
+
+    identities:
+      hr:
+        msp-id: HRMSP
+        org: HR
+        cert-path: \\wsl.localhost\Ubuntu\home\nilesh\DRDO_BLOCKCHAIN_PROJECT\organizations\peerOrganizations\hr.certportal.com\users\User1@hr.certportal.com\msp\signcerts\cert.pem
+        key-dir: \\wsl.localhost\Ubuntu\home\nilesh\DRDO_BLOCKCHAIN_PROJECT\organizations\peerOrganizations\hr.certportal.com\users\User1@hr.certportal.com\msp\keystore
+      director:
+        msp-id: DirectorMSP
+        org: Director
+        cert-path: \\wsl.localhost\Ubuntu\home\nilesh\DRDO_BLOCKCHAIN_PROJECT\organizations\peerOrganizations\director.certportal.com\users\User1@director.certportal.com\msp\signcerts\cert.pem
+        key-dir: \\wsl.localhost\Ubuntu\home\nilesh\DRDO_BLOCKCHAIN_PROJECT\organizations\peerOrganizations\director.certportal.com\users\User1@director.certportal.com\msp\keystore
+      verifier:
+        msp-id: HRMSP
+        org: HR
+        cert-path: \\wsl.localhost\Ubuntu\home\nilesh\DRDO_BLOCKCHAIN_PROJECT\organizations\peerOrganizations\hr.certportal.com\users\User2@hr.certportal.com\msp\signcerts\cert.pem
+        key-dir: \\wsl.localhost\Ubuntu\home\nilesh\DRDO_BLOCKCHAIN_PROJECT\organizations\peerOrganizations\hr.certportal.com\users\User2@hr.certportal.com\msp\keystore
+
+    functions:
+      create-certificate: CreateCertificate
+      get-certificate: GetCertificate
+      get-certificate-with-tx-id: GetCertificateWithTxID
+      revoke-certificate: RevokeCertificate
+      get-certificate-history: GetCertificateHistory
+      get-all-certificates: GetAllCertificates

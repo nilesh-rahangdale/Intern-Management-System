@@ -1,0 +1,88 @@
+# Backend (Java/Spring Boot/Maven)
+Backend/target/
+Backend/dist/
+Backend/*.jar
+Backend/*.war
+Backend/.classpath
+Backend/.project
+Backend/.settings/
+Backend/.idea/
+Backend/*.iml
+Backend/.vscode/
+Backend/*.log
+Backend/logs/
+Backend/*.pid
+
+# Frontend (Node.js/npm/React)
+Frontend/node_modules/
+Frontend/dist/
+Frontend/build/
+Frontend/npm-debug.log*
+Frontend/yarn-debug.log*
+Frontend/yarn-error.log*
+Frontend/.vscode/
+Frontend/.idea/
+Frontend/*.iml
+Frontend/.DS_Store
+
+# Blockchain (Hyperledger Fabric/Go)
+Blockchain/logs/
+Blockchain/*.log
+
+# IDE and Editor
+.vscode/
+.idea/
+.sublime-project
+.sublime-workspace
+*.code-workspace
+*.swp
+*.swo
+*~
+.editorconfig
+
+# OS
+.DS_Store
+Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+*.temp
+
+
+# Build and distribution
+*/dist/
+*/build/
+*/target/
+out/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+
+
+# Development
+.vscode/settings.json
+.vscode/launch.json
+*.pem
+*.key
+*.cert
+
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# System files
+.AppleDouble
+.LSOverride

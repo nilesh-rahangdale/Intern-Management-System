@@ -1,0 +1,15 @@
+.git
+.github
+.idea
+.vscode
+target
+**/target
+*.iml
+*.log
+docker-compose*.yml
+AGENTS.md
+API_DOCUMENTATION.md
+ARCHITECTURE_DIAGRAM.md
+FABRIC_INTEGRATION_GUIDE.md
+README.md
+QUICK_REFERENCE.md
